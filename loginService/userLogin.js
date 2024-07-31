@@ -1,19 +1,17 @@
 import userModel from "../Schema/userSchema.js";
 import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
 
-// const match = async (pass1, pass2) => {
-//     const a = await bcrypt.compare(password, encPass);
-//     return a;
-// }
 
 export const logUser = async (req, res) => {
     const { email, password } = req.body;
-    const check = await userModel.findOne({ email });
-    if (check) {
-        const encPass = check.password;
+    const user = await userModel.findOne({ email });
+    if (user) {
+        const encPass = user.password;
         bcrypt.compare(password, encPass).then(function (result) {
             if (result) {
-                res.send("Succesfull login")
+                const token = jsonwebtoken.sign({ email, password }, "1234")
+                res.send(`Succesfull login , your token : ${token}`)
             } else {
                 res.send("Wrong password")
             }
